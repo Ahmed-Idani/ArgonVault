@@ -7,13 +7,11 @@ import (
 	"ArgonVault/cmd"
 	"ArgonVault/internal"
 	"errors"
-	"fmt"
 	"os"
 )
 
 func checkIfFileExists(filePath string) bool {
-	info, error := os.Stat(filePath)
-	fmt.Println("file infos:", info)
+	_, error := os.Stat(filePath)
 	return !errors.Is(error, os.ErrNotExist)
 }
 func main() {
