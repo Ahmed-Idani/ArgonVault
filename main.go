@@ -11,16 +11,16 @@ import (
 	"os"
 )
 
-var DATA_PATH string = "./data/storage.db"
-
 func checkIfFileExists(filePath string) bool {
 	info, error := os.Stat(filePath)
 	fmt.Println("file infos:", info)
 	return !errors.Is(error, os.ErrNotExist)
 }
 func main() {
-	if !checkIfFileExists(DATA_PATH) {
-		internal.InitStorage(DATA_PATH)
+	if !checkIfFileExists(internal.DataPath) {
+		if err := internal.InitStorage(); err != nil {
+			panic(err)
+		}
 	}
 	cmd.Execute()
 }

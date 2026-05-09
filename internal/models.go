@@ -1,10 +1,6 @@
 package internal
 
-import (
-	"database/sql"
-
-	_ "github.com/mattn/go-sqlite3"
-)
+import "fmt"
 
 var sqlCreateTables = []string{
 	`CREATE TABLE IF NOT EXISTS vaults (
@@ -25,7 +21,7 @@ var sqlCreateTables = []string{
 	);`,
 	`CREATE TABLE IF NOT EXISTS configs (
 		key			TEXT PRIMARY KEY,
-		value		TEXT NOT NULL 
+		value		TEXT NOT NULL
 	);`,
 	`CREATE TABLE IF NOT EXISTS audit_log (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,28 +33,16 @@ var sqlCreateTables = []string{
     `,
 }
 
-func InitStorage(dataPath string) {
-	var err error
-	db, err := sql.Open("sqlite3", dataPath)
+func InitStorage() error {
+	db, err := OpenDB()
 	if err != nil {
-		panic(err)
+		return err
 	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			panic(err)
-		}
-	}()
-
-	if err = db.Ping(); err != nil {
-		panic(err)
-	}
-	if _, err := db.Exec("PRAGMA foreign_keys = ON"); err != nil {
-		panic(err)
-	}
+	defer db.Close()
 	for _, query := range sqlCreateTables {
-		_, err := db.Exec(query)
-		if err != nil {
-			panic(err)
+		if _, err := db.Exec(query); err != nil {
+			return fmt.Errorf("create table: %w", err)
 		}
 	}
+	return nil
 }
