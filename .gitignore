@@ -1,2 +1,10 @@
-internal-docs/
 .idea/
+data/storage.db
+
+
+/bin
+/ArgonVault
+*.exe
+*.out
+*.test
+
