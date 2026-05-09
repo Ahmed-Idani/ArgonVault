@@ -1,11 +1,47 @@
 package internal
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+	"time"
+)
+
+type Vault struct {
+	ID   int
+	Name string
+	Salt []byte
+}
+
+type Secret struct {
+	ID         int
+	Name       string
+	Ciphertext []byte
+	IV         []byte
+	VaultID    int
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}
+
+type SecretMeta struct {
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+type AuditLog struct {
+	ID         int
+	Action     string
+	SecretName sql.NullString
+	VaultName  sql.NullString
+	Status     string
+	Timestamp  time.Time
+}
 
 var sqlCreateTables = []string{
 	`CREATE TABLE IF NOT EXISTS vaults (
 	id		INTEGER PRIMARY KEY AUTOINCREMENT,
 	name	TEXT UNIQUE NOT NULL
+	salt    BLOB UNIQUE NOT NULL
 	);`,
 	`CREATE TABLE IF NOT EXISTS secrets (
 		id					INTEGER PRIMARY KEY AUTOINCREMENT,
