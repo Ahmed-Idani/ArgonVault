@@ -4,6 +4,7 @@ data/storage.db
 
 /bin
 /ArgonVault
+/argonv
 *.exe
 *.out
 *.test
