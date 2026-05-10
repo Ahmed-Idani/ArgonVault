@@ -232,18 +232,6 @@ Every write path is symmetric to a corresponding read path; failures are logged 
 
 ---
 
-## Roadmap
-
-- [ ] Hardware-backed key storage (YubiKey / TPM / Secure Enclave)
-- [ ] Clipboard copy with auto-clear timeout
-- [ ] Vault import from `.env`, `1password`, `bitwarden` exports
-- [ ] Optional encrypted backup/sync over user-supplied transport (S3, rsync, git)
-- [ ] Shell completion for vault and secret names
-- [ ] WASM build for browser-side decryption of exports
-- [ ] Argon2id parameter calibration command (`argonv tune`)
-
----
-
 ## License
 
 Released under the **MIT License**. See [`LICENSE`](LICENSE) for details.
