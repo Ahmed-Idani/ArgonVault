@@ -1,8 +1,10 @@
 package internal
 
 import (
+	"crypto/rand"
 	"database/sql"
 	"errors"
+	"fmt"
 )
 
 var ErrNotFound = errors.New("not found")
@@ -10,13 +12,18 @@ var ErrNotFound = errors.New("not found")
 // Vaults
 
 func CreateVault(name string) error {
+	salt := make([]byte, vaultSaltLen)
+	if _, err := rand.Read(salt); err != nil {
+		return fmt.Errorf("generate salt: %w", err)
+	}
+
 	db, err := OpenDB()
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	_, err = db.Exec(`INSERT INTO vaults(name) VALUES(?)`, name)
+	_, err = db.Exec(`INSERT INTO vaults(name, salt) VALUES(?, ?)`, name, salt)
 	return err
 }
 
