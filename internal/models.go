@@ -40,8 +40,8 @@ type AuditLog struct {
 var sqlCreateTables = []string{
 	`CREATE TABLE IF NOT EXISTS vaults (
 	id		INTEGER PRIMARY KEY AUTOINCREMENT,
-	name	TEXT UNIQUE NOT NULL
-	salt    BLOB UNIQUE NOT NULL
+	name	TEXT UNIQUE NOT NULL,
+	salt    BLOB NOT NULL
 	);`,
 	`CREATE TABLE IF NOT EXISTS secrets (
 		id					INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,6 +79,12 @@ func InitStorage() error {
 		if _, err := db.Exec(query); err != nil {
 			return fmt.Errorf("create table: %w", err)
 		}
+	}
+	if _, err := db.Exec(
+		`INSERT INTO configs(key, value) VALUES(?, ?) ON CONFLICT(key) DO NOTHING`,
+		ConfigKeyVaultVersion, VaultVersion,
+	); err != nil {
+		return fmt.Errorf("set vault version: %w", err)
 	}
 	return nil
 }
