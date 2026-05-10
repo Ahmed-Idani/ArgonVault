@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"ArgonVault/internal"
+	"ArgonVault/internal/ui"
 	"errors"
 	"fmt"
 
@@ -33,7 +34,7 @@ Examples:
 				return fmt.Errorf("delete vault: %w", err)
 			}
 			_ = internal.LogAction("DELETE", vaultName, "", "SUCCESS")
-			fmt.Printf("vault %q deleted\n", vaultName)
+			ui.Success("vault %q deleted", vaultName)
 			return nil
 		}
 
@@ -54,7 +55,7 @@ Examples:
 		}
 
 		_ = internal.LogAction("DELETE", vaultName, name, "SUCCESS")
-		fmt.Printf("secret %q deleted from vault %q\n", name, vaultName)
+		ui.Success("secret %q deleted from vault %q", name, vaultName)
 		return nil
 	},
 }

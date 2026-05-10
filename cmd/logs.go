@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"ArgonVault/internal"
+	"ArgonVault/internal/ui"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -31,10 +32,11 @@ Examples:
 			return fmt.Errorf("read audit log: %w", err)
 		}
 		if len(logs) == 0 {
-			fmt.Println("no audit entries")
+			ui.Info("no audit entries")
 			return nil
 		}
 
+		rows := make([][]string, 0, len(logs))
 		for _, l := range logs {
 			vault := "-"
 			if l.VaultName.Valid {
@@ -44,14 +46,19 @@ Examples:
 			if l.SecretName.Valid {
 				secret = l.SecretName.String
 			}
-			fmt.Printf("%s\t%s\t%s\tvault=%s\tsecret=%s\n",
+			rows = append(rows, []string{
 				l.Timestamp.Format("2006-01-02 15:04:05"),
 				l.Action,
 				l.Status,
 				vault,
 				secret,
-			)
+			})
 		}
+		fmt.Println(ui.Table(
+			[]string{"TIME", "ACTION", "STATUS", "VAULT", "SECRET"},
+			rows,
+			2, // STATUS column gets colored
+		))
 		return nil
 	},
 }

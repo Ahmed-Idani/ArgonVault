@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"ArgonVault/internal"
+	"ArgonVault/internal/ui"
 	"errors"
 	"fmt"
 
@@ -26,12 +27,14 @@ Examples:
 				return fmt.Errorf("list vaults: %w", err)
 			}
 			if len(vaults) == 0 {
-				fmt.Println("no vaults yet — create one with `argonv init --name <name>`")
+				ui.Info("no vaults yet — create one with `argonv init --name <name>`")
 				return nil
 			}
+			rows := make([][]string, 0, len(vaults))
 			for _, v := range vaults {
-				fmt.Println(v.Name)
+				rows = append(rows, []string{v.Name})
 			}
+			fmt.Println(ui.Table([]string{"VAULT"}, rows, -1))
 			return nil
 		}
 
@@ -48,16 +51,20 @@ Examples:
 			return fmt.Errorf("list secrets: %w", err)
 		}
 		if len(secrets) == 0 {
-			fmt.Printf("vault %q is empty\n", vaultName)
+			ui.Info("vault %q is empty", vaultName)
 			return nil
 		}
+
+		rows := make([][]string, 0, len(secrets))
 		for _, s := range secrets {
-			fmt.Printf("%s\t(created %s, updated %s)\n",
+			rows = append(rows, []string{
 				s.Name,
 				s.CreatedAt.Format("2006-01-02 15:04"),
 				s.UpdatedAt.Format("2006-01-02 15:04"),
-			)
+			})
 		}
+		fmt.Println(ui.Heading(fmt.Sprintf("vault: %s", vaultName)))
+		fmt.Println(ui.Table([]string{"SECRET", "CREATED", "UPDATED"}, rows, -1))
 		return nil
 	},
 }
