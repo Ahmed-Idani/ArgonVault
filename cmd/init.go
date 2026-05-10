@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"ArgonVault/internal"
+	"ArgonVault/internal/ui"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -17,10 +18,13 @@ treat it as a directory'`,
 		if name == "" {
 			return fmt.Errorf("vault name is required (use --name/-n)")
 		}
+		if _, err := internal.EnsureMasterPassword(); err != nil {
+			return err
+		}
 		if err := internal.CreateVault(name); err != nil {
 			return fmt.Errorf("create vault: %w", err)
 		}
-		fmt.Printf("vault %q created\n", name)
+		ui.Success("vault %q created", name)
 		return nil
 	},
 }

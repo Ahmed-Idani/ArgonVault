@@ -44,7 +44,13 @@ Example:
 			return fmt.Errorf("read secret: %w", err)
 		}
 
-		plaintext, err := internal.DecryptSecret(s.Ciphertext, s.IV, v.Salt)
+		pass, err := internal.EnsureMasterPassword()
+		if err != nil {
+			_ = internal.LogAction("GET", vaultName, name, "FAILURE")
+			return err
+		}
+
+		plaintext, err := internal.Decrypt(&internal.EncryptedData{Ciphertext: s.Ciphertext, IV: s.IV}, pass, v.Salt)
 		if err != nil {
 			_ = internal.LogAction("GET", vaultName, name, "FAILURE")
 			return fmt.Errorf("decrypt secret: %w", err)

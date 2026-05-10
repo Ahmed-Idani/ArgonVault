@@ -50,13 +50,18 @@ Example:
 			return fmt.Errorf("list secrets: %w", err)
 		}
 
+		pass, err := internal.EnsureMasterPassword()
+		if err != nil {
+			return err
+		}
+
 		bundle := exportedVault{Vault: v.Name, Secrets: make([]exportedSecret, 0, len(metas))}
 		for _, m := range metas {
 			s, err := internal.GetSecret(v.ID, m.Name)
 			if err != nil {
 				return fmt.Errorf("read secret %q: %w", m.Name, err)
 			}
-			plaintext, err := internal.DecryptSecret(s.Ciphertext, s.IV, v.Salt)
+			plaintext, err := internal.Decrypt(&internal.EncryptedData{Ciphertext: s.Ciphertext, IV: s.IV}, pass, v.Salt)
 			if err != nil {
 				return fmt.Errorf("decrypt secret %q: %w", m.Name, err)
 			}

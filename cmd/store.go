@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"ArgonVault/internal"
+	"ArgonVault/internal/ui"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -36,20 +37,25 @@ Example:
 			}
 			return fmt.Errorf("lookup vault: %w", err)
 		}
+		pass, err := internal.EnsureMasterPassword()
+		if err != nil {
+			_ = internal.LogAction("STORE", vaultName, name, "FAILURE")
+			return err
+		}
 
-		ciphertext, iv, err := internal.EncryptSecret([]byte(data), v.Salt)
+		ed, err := internal.Encrypt([]byte(data), pass, v.Salt)
 		if err != nil {
 			_ = internal.LogAction("STORE", vaultName, name, "FAILURE")
 			return fmt.Errorf("encrypt secret: %w", err)
 		}
 
-		if err := internal.SaveSecret(v.ID, name, ciphertext, iv); err != nil {
+		if err := internal.SaveSecret(v.ID, name, ed.Ciphertext, ed.IV); err != nil {
 			_ = internal.LogAction("STORE", vaultName, name, "FAILURE")
 			return fmt.Errorf("save secret: %w", err)
 		}
 
 		_ = internal.LogAction("STORE", vaultName, name, "SUCCESS")
-		fmt.Printf("secret %q stored in vault %q\n", name, vaultName)
+		ui.Success("secret %q stored in vault %q", name, vaultName)
 		return nil
 	},
 }
